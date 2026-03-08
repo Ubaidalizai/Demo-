@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { BASE_URL } from '../config';
 
 export function PrescriptionForm() {
   const { prescriptionId, patientId } = useParams();
@@ -25,10 +26,8 @@ export function PrescriptionForm() {
   useEffect(() => {
     if (prescriptionId) {
       axios
-        .get(
-          `http://127.0.0.1:4000/api/v1/prescriptions/prescription/${prescriptionId}`
-        )
-        .then((response) => setFormData(response.data.data))
+        .get(`${BASE_URL}/prescriptions/prescription/${prescriptionId}`)
+        .then((response) => setFormData(response.data?.data || response.data || formData))
         .catch((error) => console.error('Error fetching prescription:', error));
     }
   }, [prescriptionId]);
@@ -57,7 +56,7 @@ export function PrescriptionForm() {
       if (prescriptionId) {
         // Update existing prescription
         const response = await axios.patch(
-          `http://localhost:4000/api/v1/prescriptions/prescription/${prescriptionId}`,
+          `${BASE_URL}/prescriptions/prescription/${prescriptionId}`,
           formData
         );
         if (response.status === 200) {
@@ -66,7 +65,7 @@ export function PrescriptionForm() {
       } else if (patientId) {
         // Create a new prescription if only patientId exists
         const response = await axios.post(
-          `http://127.0.0.1:4000/api/v1/prescriptions/patient/name/${patientId}`,
+          `${BASE_URL}/prescriptions/patient/name/${patientId}`,
           formData
         );
         if (response.status === 201) {

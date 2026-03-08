@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { BASE_URL } from '../config';
 
 export function PrescriptionDetail() {
   const { prescriptionId, patientId } = useParams();
@@ -8,14 +9,12 @@ export function PrescriptionDetail() {
   const [prescription, setPrescription] = useState(null);
 
   useEffect(() => {
-    // Fetch prescription details from the backend
     const fetchPrescription = async () => {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:4000/api/v1/prescriptions/prescription/${prescriptionId}`
+          `${BASE_URL}/prescriptions/prescription/${prescriptionId}`
         );
-        console.log(response.data.data);
-        setPrescription(response.data.data);
+        setPrescription(response.data?.data || response.data);
       } catch (error) {
         console.error('Error fetching prescription:', error);
       }
@@ -27,7 +26,7 @@ export function PrescriptionDetail() {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `http://127.0.0.1:4000/api/v1/prescriptions/prescription/${prescriptionId}`
+        `${BASE_URL}/prescriptions/prescription/${prescriptionId}`
       );
       console.log('Prescription deleted successfully');
       navigate('/patients/1/prescriptions'); // Redirect to prescription list
@@ -39,7 +38,7 @@ export function PrescriptionDetail() {
   const handleUpdate = async (updatedData) => {
     try {
       const response = await axios.patch(
-        `http://127.0.0.1:4000/api/v1/prescriptions/prescription/${prescriptionId}`,
+        `${BASE_URL}/prescriptions/prescription/${prescriptionId}`,
         updatedData
       );
       setPrescription(response.data.data); // Update state with new prescription data
