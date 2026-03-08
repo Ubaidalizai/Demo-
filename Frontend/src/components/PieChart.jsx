@@ -29,9 +29,10 @@ const PieChart = ({
 
   // Calculate total and percentages
   const processedData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    const arr = Array.isArray(data) ? data : [];
+    if (!arr.length) return [];
 
-    const total = data.reduce((sum, item) => sum + (item.total || 0), 0);
+    const total = arr.reduce((sum, item) => sum + (item.total || 0), 0);
     
     if (total === 0) return [];
 

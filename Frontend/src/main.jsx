@@ -5,6 +5,10 @@ import App from './App';
 
 // Import the axios instance to make it available globally
 import api from './api-interceptor';
+import { initDemoMode } from './mockApi';
+
+// Initialize demo mode first (intercepts fetch/axios with mock data when VITE_DEMO_MODE=true)
+initDemoMode();
 
 // Make axios available globally for the interceptor in AuthContext
 window.axios = api;

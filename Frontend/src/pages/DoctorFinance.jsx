@@ -87,8 +87,9 @@ function DoctorFinance() {
       }
 
       const result = await response.json();
-      setDrKhataRecords(result || []);
-      setTotalPages(result.pages || Math.ceil(result.results.length / limit));
+      const records = result && typeof result === 'object' ? result : { results: [], pages: 1 };
+      setDrKhataRecords(records);
+      setTotalPages((records?.pages ?? Math.ceil((records?.results?.length ?? 0) / limit)) || 1);
       setLoading(false);
     } catch (err) {
       setError(err.message);

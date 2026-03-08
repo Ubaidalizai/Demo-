@@ -8,6 +8,23 @@ A comprehensive Hospital Management System built with React, Node.js, and MongoD
 
 ---
 
+## 🎮 Demo Mode (Frontend Only, No Backend)
+
+Run the app as a **demo** with mock data—no backend or database required:
+
+```bash
+cd Frontend
+npm install
+npm run demo
+```
+
+Then open **http://localhost:5173** in your browser. You'll be logged in as Demo Admin with sample data for patients, pharmacy, sales, dashboard, and more.
+
+- **Demo script**: `npm run demo` (uses `VITE_DEMO_MODE=true`)
+- **Build for demo**: `npm run build:demo` (production build with mock data)
+
+---
+
 ## 🚀 Features
 
 - **User Management**: Role-based access control (Admin, Doctor, Pharmacist, Receptionist)
@@ -156,8 +173,10 @@ Eye-HMS/
 - `npm run setup:admin` - Create admin account
 
 ### Frontend
-- `npm run dev` - Start development server
+- `npm run dev` - Start development server (requires backend)
+- `npm run demo` - **Demo mode**: frontend only with mock data (no backend)
 - `npm run build` - Build for production
+- `npm run build:demo` - Build for demo deployment (mock data)
 - `npm run preview` - Preview production build
 
 ## 🤝 Contributing

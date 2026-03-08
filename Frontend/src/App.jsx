@@ -201,7 +201,7 @@ const App = () => {
                   }
                 />
                 <Route
-                  path='/Admin-panel'
+                  path='/admin-panel'
                   element={
                     <ProtectedWrapper allowedRoles={[Roles.ADMIN]}>
                       <AdminPanel />

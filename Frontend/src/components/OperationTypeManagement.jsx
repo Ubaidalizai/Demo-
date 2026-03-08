@@ -83,8 +83,9 @@ const OperationTypeManagement = () => {
       }
 
       const data = await response.json();
-      setOperationTypes(data.data || []);
-      setTotalPages(data.totalPages || Math.ceil(data.results / limit));
+      const types = Array.isArray(data.data) ? data.data : (data.data?.results || []);
+      setOperationTypes(types);
+      setTotalPages(data.totalPages || Math.ceil((data.data?.total ?? data.results ?? types.length) / limit));
     } catch (error) {
       console.error('Error fetching operation types:', error);
       toast.error('Failed to fetch operation types');

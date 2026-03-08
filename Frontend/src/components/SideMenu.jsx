@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../api-interceptor";
 import { RoleMenus } from "../roles";
 import {
   FaTachometerAlt,
@@ -15,6 +15,8 @@ import {
   FaCalculator,
   FaGlasses,
   FaSitemap,
+  FaExchangeAlt,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import BranchesMenu from "./BranchesMenu.jsx";
 import { BASE_URL, IMAGE_BASE_URL } from "../config";
@@ -23,7 +25,7 @@ const menuItems = [
   { id: "dashboard", path: "/", icon: <FaTachometerAlt />, label: "Dashboard" },
   {
     id: "admin-panel",
-    path: "/Admin-panel",
+    path: "/admin-panel",
     icon: <FaUserShield />,
     label: "Admin Panel",
   },
@@ -76,7 +78,19 @@ const menuItems = [
     icon: <FaGlasses />,
     label: "Glasses",
   },
-  { id: "branches", path: "", icon: <FaSitemap />, label: "Branches" }, // Updated with sitemap icon
+  {
+    id: "move",
+    path: "/move",
+    icon: <FaExchangeAlt />,
+    label: "Move Product",
+  },
+  {
+    id: "expired-product",
+    path: "/ExpiredProduct",
+    icon: <FaExclamationTriangle />,
+    label: "Expired Items",
+  },
+  { id: "branches", path: "", icon: <FaSitemap />, label: "Branches" },
 ];
 
 function SideMenu({ onMobileItemClick }) {
@@ -100,7 +114,7 @@ function SideMenu({ onMobileItemClick }) {
 
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/user/profile`, {
+        const res = await api.get(`/user/profile`, {
           withCredentials: true,
         });
         if (res.status === 200) {

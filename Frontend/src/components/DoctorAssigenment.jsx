@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { BASE_URL, IMAGE_BASE_URL } from '../config';
 import { useAuth } from "../AuthContext.jsx";
@@ -18,12 +18,13 @@ const Button = ({ children, onClick, className, disabled }) => (
 //Custom Modal/Dialog Component
 const Modal = ({ open, onClose, children }) => {
   if (!open) return null;
+  const childArray = React.Children.toArray(children);
   return (
     <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50'>
       <div className='bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-md'>
         <div className='flex justify-between items-center mb-4'>
           <div className='text-lg font-medium text-gray-900'>
-            {children[0]} {/* Assuming first child is the title */}
+            {childArray[0]}
           </div>
           <button
             onClick={onClose}
@@ -45,7 +46,7 @@ const Modal = ({ open, onClose, children }) => {
           </button>
         </div>
         <div className='space-y-4'>
-          {children.slice(1)} {/* All children except the first one (title) */}
+          {childArray.slice(1)}
         </div>
       </div>
     </div>
@@ -145,8 +146,9 @@ const DoctorBranchAssignment = () => {
         }
       );
       const data = await response.json();
-      setAssignments(data.data);
-      setTotalPages(data.totalPages || Math.ceil(data.totalResults / limit));
+      const list = Array.isArray(data.data) ? data.data : (data.data?.results || []);
+      setAssignments(list);
+      setTotalPages(data.totalPages || Math.ceil((data.data?.total ?? data.totalResults ?? list.length) / limit));
     } catch (error) {
       console.error('Error fetching assignments:', error);
       setError('Failed to fetch assignments');
@@ -277,7 +279,7 @@ const DoctorBranchAssignment = () => {
             className='block w-full pl-3 pr-10 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md'
           >
             <option value=''>All Doctors</option>
-            {perDoctors?.map((doctor) => (
+            {(perDoctors || []).map((doctor) => (
               <option key={doctor._id} value={doctor?._id}>
                 {doctor?.firstName} {doctor?.lastName}
               </option>
@@ -354,7 +356,7 @@ const DoctorBranchAssignment = () => {
             onChange={(e) => setSelectedDoctor(e.target.value)}
           >
             <option value=''>Select Doctor</option>
-            {perDoctors.map((doctor) => (
+            {(perDoctors || []).map((doctor) => (
               <option key={doctor._id} value={doctor._id}>
                 {doctor.firstName} {doctor.lastName}
               </option>

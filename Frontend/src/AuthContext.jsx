@@ -23,6 +23,22 @@ const MOCK_ADMIN_USER = {
   permissions: ['all']
 };
 
+// Mock doctors and categories for demo (used when auth disabled)
+const MOCK_DOCTORS = [
+  { _id: 'doc1', firstName: 'Dr. Ahmed', lastName: 'Khan', percentage: 30 },
+  { _id: 'doc2', firstName: 'Dr. Sara', lastName: 'Ali', percentage: 25 },
+  { _id: 'doc3', firstName: 'Dr. Omar', lastName: 'Hassan', percentage: 20 },
+];
+const MOCK_CATEGORIES = [
+  { _id: 'cat1', name: 'drug', type: 'income' },
+  { _id: 'cat2', name: 'glass', type: 'income' },
+  { _id: 'cat3', name: 'oct', type: 'income' },
+  { _id: 'cat4', name: 'opd', type: 'income' },
+  { _id: 'cat5', name: 'operation', type: 'income' },
+  { _id: 'cat6', name: 'utilities', type: 'expense' },
+  { _id: 'cat7', name: 'salary', type: 'expense' },
+];
+
 const AuthContext = createContext(null);
 
 export const useAuth = () => {
@@ -223,9 +239,11 @@ export const AuthProvider = ({ children }) => {
     // Only run the auth check once when the component mounts
     const initializeAuth = async () => {
       try {
-        // If auth is disabled, set mock user immediately
+        // If auth is disabled, set mock user and data immediately
         if (DISABLE_AUTH) {
           setUser(MOCK_ADMIN_USER);
+          setPerDoctors(MOCK_DOCTORS);
+          setCategories(MOCK_CATEGORIES);
           setAuthStatus('authenticated');
           localStorage.setItem(AUTH_STATUS_KEY, 'authenticated');
           localStorage.setItem('lastLoginTime', Date.now().toString());

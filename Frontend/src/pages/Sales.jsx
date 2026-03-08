@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
-import { FaPlus, FaTrash, FaSearch, FaPrint } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaSearch, FaPrint, FaEdit } from 'react-icons/fa';
 import AddSale from '../components/AddSale.jsx';
+import EditSale from '../components/EditSale.jsx';
 import { toast, ToastContainer } from 'react-toastify';
 import Pagination from '../components/Pagination.jsx';
 import { BASE_URL } from '../config';
@@ -43,11 +44,11 @@ export default function Sales() {
     try {
       let baseUrl = `${BASE_URL}/sales?page=${currentPage}&limit=${limit}`;
 
-      if (authContext.user.role === 'receptionist') {
+      if (authContext?.user?.role === 'receptionist') {
         baseUrl += '&category=sunglasses,frame,glass';
-      } else if (authContext.user.role === 'pharmacist') {
+      } else if (authContext?.user?.role === 'pharmacist') {
         baseUrl += '&category=drug';
-      } else if (authContext.user.role === 'admin') {
+      } else if (authContext?.user?.role === 'admin') {
         baseUrl += '&category=drug,sunglasses,glass,frame';
       }
 
@@ -69,8 +70,10 @@ export default function Sales() {
       }
 
       const data = await response.json();
-      setSales(data.data.results);
-      setTotalPages(data.totalPages || Math.ceil(data.results / limit));
+      const list = Array.isArray(data?.data?.results) ? data.data.results : (data?.results ?? []);
+      setSales(list);
+      const total = data?.data?.total ?? data?.total ?? list.length;
+      setTotalPages((data?.totalPages ?? Math.ceil(total / limit)) || 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -157,7 +160,7 @@ export default function Sales() {
             </div>
 
             <div className='flex flex-col sm:flex-row items-start sm:items-end gap-4'>
-              {authContext.user.role !== 'pharmacist' && (
+              {authContext?.user?.role !== 'pharmacist' && (
                 <div className='w-full sm:w-auto'>
                   <label
                     htmlFor='category'
@@ -173,7 +176,7 @@ export default function Sales() {
                     className='block w-full sm:w-48 h-10 pl-3 pr-10 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   >
                     <option value=''>All Categories</option>
-                    {authContext.user.role === 'admin' && (
+                    {authContext?.user?.role === 'admin' && (
                       <option value='drug'>Drug</option>
                     )}
                     <option value='sunglasses'>Sunglasses</option>
@@ -225,7 +228,7 @@ export default function Sales() {
                         >
                           Sale Price
                         </th>
-                        {authContext.user.role !== 'pharmacist' && (
+                        {authContext?.user?.role !== 'pharmacist' && (
                           <th
                             scope='col'
                             className='px-4 sm:px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider text-left'
@@ -251,7 +254,7 @@ export default function Sales() {
                         >
                           Total Sale
                         </th>
-                        {authContext.user.role === 'receptionist' || authContext.user.role === 'admin' && (
+                        {(authContext?.user?.role === 'receptionist' || authContext?.user?.role === 'admin') && (
                           <>
                             <th className='px-4 sm:px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider text-left'>
                               Discount
@@ -285,13 +288,13 @@ export default function Sales() {
                             <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                               {sale.productRefId?.salePrice}
                             </td>
-                            {authContext.user.role !== 'pharmacist' && (
+                            {authContext?.user?.role !== 'pharmacist' && (
                               <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                                 {sale.category}
                               </td>
                             )}
                             <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                              {sale.date.split('T')[0]}
+                              {sale.date ? String(sale.date).split('T')[0] : 'N/A'}
                             </td>
                             <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                               {`${sale.userID?.firstName} ${sale.userID?.lastName}`}
@@ -299,18 +302,25 @@ export default function Sales() {
                             <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                               {sale.income}
                             </td>
-                            {authContext.user.role === 'receptionist' || authContext.user.role === 'admin' && (
+                            {(authContext?.user?.role === 'receptionist' || authContext?.user?.role === 'admin') && (
                               <>
                                 <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                  {sale.discount.toFixed(2)}
+                                  {(sale.discount ?? 0).toFixed(2)}
                                 </td>
                                 <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                  {sale.category === 'drug' ? sale.income : sale.finalPrice.toFixed(2)} 
+                                  {sale.category === 'drug' ? sale.income : (sale.finalPrice ?? sale.income ?? 0).toFixed(2)}
                                 </td>
                               </>
                             )}
                             <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-center'>
                               <div className='flex justify-center space-x-3'>
+                                <button
+                                  onClick={() => handleEdit(sale)}
+                                  className='text-indigo-600 hover:bg-indigo-50 p-1.5 rounded transition-colors'
+                                  aria-label='Edit sale'
+                                >
+                                  <FaEdit className='w-4 h-4' />
+                                </button>
                                 <button
                                   onClick={() => handlePrintSale(sale)}
                                   className='text-blue-600 hover:bg-blue-50 p-1.5 rounded transition-colors'
@@ -376,6 +386,17 @@ export default function Sales() {
         setShowBill={setShowBillModal}
         soldItems={selectedSale}
       />
+
+      {showEditModal && editingSale && (
+        <EditSale
+          sale={editingSale}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingSale(null);
+          }}
+          onSuccess={handleEditComplete}
+        />
+      )}
     </div>
   );
 }

@@ -242,7 +242,7 @@ const TableSection = memo(({
                   {glass.category}
                 </td>
                 <td className='px-4 py-3 whitespace-nowrap text-sm text-gray-600'>
-                  {glass.createdAt.split('T')[0]}
+                  {glass.createdAt ? String(glass.createdAt).split('T')[0] : 'N/A'}
                 </td>
                 <td className='px-4 py-3 whitespace-nowrap text-sm text-gray-600'>
                   {glass.purchasePrice}
@@ -382,8 +382,10 @@ const Glasses = () => {
       }
 
       const data = await res.json();
-      setGlasses(data.data.results);
-      setTotalPages(data.totalPages || Math.ceil(data.results / limit));
+      const list = Array.isArray(data?.data?.results) ? data.data.results : (data?.results ?? []);
+      setGlasses(list);
+      const total = data?.data?.total ?? data?.total ?? list.length;
+      setTotalPages((data?.totalPages ?? Math.ceil(total / limit)) || 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -406,7 +408,8 @@ const Glasses = () => {
       }
 
       const data = await response.json();
-      setSummary(data.data); // Assuming the backend returns a "summary" field
+      const arr = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      setSummary(arr);
     } catch (err) {
       console.log(err);
     }
@@ -427,7 +430,8 @@ const Glasses = () => {
       }
 
       const data = await response.json();
-      setSummary(data.data); // Assuming the backend returns a "summary" field
+      const arr = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      setSummary(arr);
     } catch (err) {
       console.log(err);
     }
@@ -451,7 +455,7 @@ const Glasses = () => {
       }
 
       const data = await response.json();
-      setGlassesSummary(data);
+      setGlassesSummary(data?.data ?? data ?? { totalSalePrice: 0, length: 0, totalStock: 0, lowStockCount: 0 });
     } catch (err) {
       console.error('Error fetching glasses summary:', err);
       setError(err.message);

@@ -51,8 +51,9 @@ export default function CategoryManagement({ filterType = null }) {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch categories');
       }
-      setCategories(data.data.results);
-      setTotalPages(data.totalPages || Math.ceil(data.data.results.length / limit));
+      const results = data.data?.results ?? (Array.isArray(data.data) ? data.data : []);
+      setCategories(results);
+      setTotalPages(data.totalPages || Math.ceil((data.data?.total ?? results.length) / limit));
     } catch (err) {
       showToast(err.message, 'error');
     } finally {

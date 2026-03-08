@@ -136,7 +136,7 @@ function PersonInfoDropdown() {
             className='w-full h-12 mb-6 text-base md:text-lg border border-gray-300 rounded-md px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
           >
             <option value=''>Select a doctor</option>
-            {doctors.map((doctor) => (
+            {(doctors || []).map((doctor) => (
               <option key={doctor._id} value={doctor._id}>
                 {`${doctor.firstName} ${doctor.lastName}`}
               </option>

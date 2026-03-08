@@ -6,7 +6,7 @@ import { MdOutlineCloudDownload } from 'react-icons/md';
 import { TbLogout } from 'react-icons/tb';
 import { useAuth } from "../AuthContext.jsx";
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api-interceptor';
 import { Bell } from 'lucide-react'; // Use the Bell icon from lucide-react
 import { BASE_URL } from '../config';
 
@@ -38,7 +38,7 @@ export default function Header() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/user/profile`, {
+      const res = await api.get(`/user/profile`, {
         withCredentials: true,
       });
 
@@ -54,7 +54,7 @@ export default function Header() {
 
   const expiredProduct = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/inventory/product/expire`, {
+      const res = await api.get(`/inventory/product/expire`, {
         withCredentials: true,
       });
       if (res?.data?.length > 0) {
@@ -69,7 +69,7 @@ export default function Header() {
 
   const expiredDrugs = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/pharmacy/expire`, {
+      const res = await api.get(`/pharmacy/expire`, {
         withCredentials: true,
       });
 
